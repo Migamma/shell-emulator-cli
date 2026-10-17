@@ -15,7 +15,7 @@ public class Terminal {
     public Terminal(){
         this.hostName = resolveHostName();
         this.userName = System.getProperty("user.name");
-        this.parser = new Parser();
+        this.parser = new Parser(System.getenv());
     }
 
     private String resolveHostName(){
