@@ -1,7 +1,15 @@
 package org.example.vfs;
 
-public class VfsLoadException extends Exception{
-    public VfsLoadException(String message){
+/**
+ * Ошибка загрузки виртуальной файловой системы из XML.
+ */
+public class VfsLoadException extends Exception {
+    /**
+     * Создаёт исключение с описанием ошибки.
+     *
+     * @param message текст ошибки для пользователя
+     */
+    public VfsLoadException(String message) {
         super(message);
     }
 }

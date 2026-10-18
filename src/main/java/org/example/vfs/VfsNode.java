@@ -1,22 +1,43 @@
 package org.example.vfs;
 
+/**
+ * Узел виртуальной файловой системы: файл или папка.
+ * <p>
+ * Хранит имя узла и папку, в которой он лежит.
+ */
 public abstract class VfsNode {
     private final String name;
     private VfsDirectory parent;
 
-    public VfsNode(String name){
+    /**
+     * Создаёт узел с заданным именем.
+     *
+     * @param name имя узла; у корневой папки пустая строка
+     */
+    public VfsNode(String name) {
         this.name = name;
     }
 
-    public String getName(){
+    /**
+     * @return имя узла
+     */
+    public String getName() {
         return name;
     }
 
-    public VfsDirectory getParent(){
+    /**
+     * @return папка, в которой лежит узел; null для корня
+     */
+    public VfsDirectory getParent() {
         return parent;
     }
 
-    void setParent(VfsDirectory parent){
+    /**
+     * Задаёт папку, в которой лежит узел. Вызывается только из {@link VfsDirectory}.
+     *
+     * @param parent родительская папка
+     */
+    void setParent(VfsDirectory parent) {
         this.parent = parent;
     }
 }

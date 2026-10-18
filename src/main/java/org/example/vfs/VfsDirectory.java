@@ -4,23 +4,47 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * Папка виртуальной файловой системы.
+ * <p>
+ * Хранит вложенные папки и файлы, упорядоченные по имени.
+ */
 public class VfsDirectory extends VfsNode {
     private final Map<String, VfsNode> children = new TreeMap<>();
 
-    public VfsDirectory(String name){
+    /**
+     * Создаёт пустую папку.
+     *
+     * @param name имя папки; у корня пустая строка
+     */
+    public VfsDirectory(String name) {
         super(name);
     }
 
-    public void addChild(VfsNode child){
+    /**
+     * Добавляет узел в папку и назначает ему эту папку родителем.
+     *
+     * @param child добавляемый файл или папка
+     */
+    public void addChild(VfsNode child) {
         children.put(child.getName(), child);
         child.setParent(this);
     }
 
-    public VfsNode getChild(String name){
+    /**
+     * Находит вложенный узел по имени.
+     *
+     * @param name имя узла
+     * @return узел или null, если узла с таким именем нет
+     */
+    public VfsNode getChild(String name) {
         return children.get(name);
     }
 
-    public Collection<VfsNode> getChildren(){
+    /**
+     * @return все вложенные узлы в порядке имён
+     */
+    public Collection<VfsNode> getChildren() {
         return children.values();
     }
 }

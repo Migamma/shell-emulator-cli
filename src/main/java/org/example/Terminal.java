@@ -42,7 +42,8 @@ public class Terminal {
      * Имя пользователя и имя хоста определяются в ОС.
      * Создаёт парсер с переменными окружения системы и реестр команд.
      *
-     * @param config настройки эмулятора из параметров командной строки
+     * @param config  настройки эмулятора из параметров командной строки
+     * @param vfsRoot корень загруженной VFS или null, если VFS не задана
      */
     public Terminal(Config config, VfsDirectory vfsRoot) {
         this.hostName = resolveHostName();
@@ -151,7 +152,7 @@ public class Terminal {
      *
      * @param scriptPath путь к файлу скрипта
      * @return true, если после скрипта нужно перейти в интерактивный режим;
-     *         false, если скрипт выполнил exit или файл не удалось прочитать
+     * false, если скрипт выполнил exit или файл не удалось прочитать
      */
     private boolean runScript(String scriptPath) {
         Path path = Path.of(scriptPath);
