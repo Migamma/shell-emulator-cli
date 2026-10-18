@@ -1,41 +1,61 @@
 package org.example.parser;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Разбивает строку ввода на имя команды и аргументы.
+ * <p>
+ * Строка делится на слова по пробельным символам.
+ * Переменная окружения вида $NAME заменяется их значениями.
+ * Неизвестные переменные заменяются пустой строкой, а слова, ставшие пустыми, отбрасываются.
+ */
 public class Parser {
     private final Map<String, String> variables;
     private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\$(\\w+)");
 
-    public Parser(Map<String, String> variables){
+    /**
+     * Создает парсер с заданными переменными окружения.
+     *
+     * @param variables переменные окружения используемые при подстановке.
+     */
+    public Parser(Map<String, String> variables) {
         this.variables = variables;
     }
-    public ParsedCommand parse(String line){
+
+    /**
+     * Разбирает строку ввода на имя команды и аргументы.
+     *
+     * @param line строка, введённая пользователем
+     * @return разобранная команда с именем и аргументами
+     * @throws IllegalArgumentException если строка пустая или после
+     *                                  подстановки переменных не осталось ни одного слова
+     */
+    public ParsedCommand parse(String line) {
 
         String command = line.trim();
 
-        if (command.isBlank()){
-            throw new IllegalArgumentException("ERROR! Line is empty");
+        if (command.isBlank()) {
+            throw new IllegalArgumentException("empty input");
         }
 
         String[] commandAll = command.split("\\s+");
 
         List<String> expanded = new ArrayList<>();
 
-        for (String name : commandAll){
+        for (String name : commandAll) {
             String expandVariable = expandVariables(name);
-            if (!expandVariable.isEmpty()){
+            if (!expandVariable.isEmpty()) {
                 expanded.add(expandVariable);
             }
         }
 
 
-        if (expanded.isEmpty()){
-             throw new IllegalArgumentException("ERROR! List is empty");
+        if (expanded.isEmpty()) {
+            throw new IllegalArgumentException("no command after variable expansion");
         }
 
         String commandName = expanded.get(0);
@@ -45,10 +65,17 @@ public class Parser {
         return obj;
     }
 
-    private String expandVariables(String word){
+    /**
+     * Заменяет переменные окружения вида $NAME в слове их значениями.
+     *
+     * @param word слово из строки ввода
+     * @return слово с подставленными значениями; неизвестные переменные
+     * заменяются пустой строкой
+     */
+    private String expandVariables(String word) {
         Matcher matcher = VARIABLE_PATTERN.matcher(word);
         StringBuilder result = new StringBuilder();
-        while (matcher.find()){
+        while (matcher.find()) {
             String name = matcher.group(1);
             String value = variables.getOrDefault(name, "");
             matcher.appendReplacement(result, Matcher.quoteReplacement(value));

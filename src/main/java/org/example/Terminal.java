@@ -9,6 +9,14 @@ import java.net.UnknownHostException;
 import java.util.Scanner;
 import java.net.InetAddress;
 
+/**
+ * Интерактивный цикл эмулятора командной оболочки (REPL).
+ * <p>
+ * Показывает приглашение к вводу, читает строки пользователя,
+ * передаёт их парсеру и выполняет найденные команды.
+ * Приглашение строится из имени пользователя и имени хоста
+ * реальной ОС в формате username@hostname:~$.
+ */
 public class Terminal {
     private final String userName;
     private final String hostName;
@@ -16,6 +24,11 @@ public class Terminal {
     private final Parser parser;
     private final CommandRegistry commands;
 
+    /**
+     * Создает терминал и подготавливает данные из ОС.
+     * Имя пользователя и имя хоста определяется в ОС.
+     * Создает парсер с переменными окружения системы и реестр команд.
+     */
     public Terminal(){
         this.hostName = resolveHostName();
         this.userName = System.getProperty("user.name");
@@ -24,6 +37,11 @@ public class Terminal {
 
     }
 
+    /**
+     * Получает название компьютера из ОС.
+     *
+     * @return имя компьютера; при ошибке ставится название localhost
+     */
     private String resolveHostName(){
         try{
             InetAddress host = InetAddress.getLocalHost();
@@ -32,10 +50,23 @@ public class Terminal {
             return DEFAULT_HOSTNAME;
         }
     }
+
+    /**
+     * Собирает приглашение для ввода.
+     *
+     * @return строка приглашения в форме username@hostname:~$.
+     */
     private String buildPrompt(){
         return userName + "@" + hostName + ":~$ ";
     }
 
+    /**
+     * Разбирает строку, выделяет команду и выполняет ее.
+     *
+     * @param line строка введенная пользователем.
+     * @return результат выполненной команды; если строку не удалось
+     * разобрать или команда не найдена, результат с ошибкой.
+     */
     private CommandResult executeLine(String line){
         ParsedCommand parsed;
         try{
@@ -54,6 +85,11 @@ public class Terminal {
         return command.execute(parsed.getArgument());
     }
 
+    /**
+     * Запускает цикл ввода и вывода команд.
+     * <p>
+     * Метод завершается по команде exit или при достижении конца ввода.
+     */
     public void run(){
         Scanner input = new Scanner(System.in);
         while (true){
@@ -67,7 +103,6 @@ public class Terminal {
                 continue;
             }
 
-
             CommandResult result = executeLine(line);
             if (!result.getOutput().isEmpty()){
                 System.out.println(result.getOutput());
@@ -76,8 +111,6 @@ public class Terminal {
             if (result.isExit()){
                 break;
             }
-
-
         }
     }
 }
