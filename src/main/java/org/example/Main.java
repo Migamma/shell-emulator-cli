@@ -1,4 +1,5 @@
 package org.example;
+
 import org.example.config.Config;
 import org.example.config.ConfigParser;
 
@@ -7,9 +8,11 @@ import org.example.config.ConfigParser;
  */
 public class Main {
     /**
-     * Запускает эмулятор.
+     * Разбирает параметры командной строки, выводит их и запускает эмулятор.
+     * <p>
+     * При неверных параметрах выводит ошибку и завершается с кодом 1.
      *
-     * @param args аргументы командной строки, пока не используются
+     * @param args параметры запуска: --vfs, --prompt и --script
      */
     public static void main(String[] args) {
         Config config;
@@ -27,7 +30,12 @@ public class Main {
         terminal.run();
     }
 
-    private static void printConfig(Config config){
+    /**
+     * Выводит значения всех параметров запуска для отладки.
+     *
+     * @param config настройки эмулятора
+     */
+    private static void printConfig(Config config) {
         System.out.println("VFS path: " + config.getVfsPath());
         System.out.println("Prompt: " + config.getPrompt());
         System.out.println("Script: " + config.getScriptPath());
