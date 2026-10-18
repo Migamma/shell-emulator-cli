@@ -7,6 +7,7 @@ import org.example.command.CommandRegistry;
 import org.example.command.Command;
 import org.example.config.Config;
 import org.example.vfs.VfsDirectory;
+import org.example.vfs.VirtualFileSystem;
 
 
 import java.io.IOException;
@@ -34,7 +35,7 @@ public class Terminal {
     private final Parser parser;
     private final CommandRegistry commands;
     private final Config config;
-    private final VfsDirectory vfsRoot;
+    private final VirtualFileSystem fileSystem;
 
     /**
      * Создаёт терминал и подготавливает данные из ОС.
@@ -51,7 +52,8 @@ public class Terminal {
         this.parser = new Parser(System.getenv());
         this.commands = new CommandRegistry();
         this.config = config;
-        this.vfsRoot = vfsRoot;
+        VfsDirectory root = vfsRoot != null ? vfsRoot : new VfsDirectory("");
+        this.fileSystem = new VirtualFileSystem(root);
 
 
     }
@@ -80,7 +82,7 @@ public class Terminal {
         if (config.getPrompt() != null) {
             return config.getPrompt();
         }
-        return userName + "@" + hostName + ":~$ ";
+        return userName + "@" + hostName + ":" + fileSystem.getPath(fileSystem.getCurrent()) +  "$ ";
     }
 
     /**
