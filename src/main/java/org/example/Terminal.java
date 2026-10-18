@@ -4,6 +4,8 @@ import org.example.parser.ParsedCommand;
 import org.example.parser.Parser;
 import org.example.command.CommandRegistry;
 import org.example.command.Command;
+import org.example.config.Config;
+
 
 import java.net.UnknownHostException;
 import java.util.Scanner;
@@ -23,17 +25,19 @@ public class Terminal {
     private static final String DEFAULT_HOSTNAME = "localhost";
     private final Parser parser;
     private final CommandRegistry commands;
-
+    private final Config config;
     /**
      * Создает терминал и подготавливает данные из ОС.
      * Имя пользователя и имя хоста определяется в ОС.
      * Создает парсер с переменными окружения системы и реестр команд.
      */
-    public Terminal(){
+    public Terminal(Config config){
         this.hostName = resolveHostName();
         this.userName = System.getProperty("user.name");
         this.parser = new Parser(System.getenv());
         this.commands = new CommandRegistry();
+        this.config = config;
+
 
     }
 
@@ -57,6 +61,9 @@ public class Terminal {
      * @return строка приглашения в форме username@hostname:~$.
      */
     private String buildPrompt(){
+        if(config.getPrompt() != null){
+            return config.getPrompt();
+        }
         return userName + "@" + hostName + ":~$ ";
     }
 

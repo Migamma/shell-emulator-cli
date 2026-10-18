@@ -22,13 +22,13 @@ public class Main {
         }
         printConfig(config);
 
-        Terminal terminal = new Terminal();
+        Terminal terminal = new Terminal(config);
 
         terminal.run();
     }
 
     private static void printConfig(Config config){
-        System.out.println("VFS config: " + config.getVfsPath());
+        System.out.println("VFS path: " + config.getVfsPath());
         System.out.println("Prompt: " + config.getPrompt());
         System.out.println("Script: " + config.getScriptPath());
     }
