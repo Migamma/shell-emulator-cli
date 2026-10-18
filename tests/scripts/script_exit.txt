@@ -1,0 +1,4 @@
+ls -l /tmp
+cd $HOME
+exit
+ls

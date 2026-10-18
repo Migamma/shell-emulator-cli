@@ -1,0 +1,3 @@
+ls -l /tmp
+cd $HOME
+ls
