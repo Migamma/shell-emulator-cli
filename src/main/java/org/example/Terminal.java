@@ -50,10 +50,10 @@ public class Terminal {
         this.hostName = resolveHostName();
         this.userName = System.getProperty("user.name");
         this.parser = new Parser(System.getenv());
-        this.commands = new CommandRegistry();
         this.config = config;
         VfsDirectory root = vfsRoot != null ? vfsRoot : new VfsDirectory("");
         this.fileSystem = new VirtualFileSystem(root);
+        this.commands = new CommandRegistry(fileSystem);
 
 
     }

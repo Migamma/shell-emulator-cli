@@ -1,5 +1,7 @@
 package org.example.command;
 
+import org.example.vfs.VirtualFileSystem;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,9 +14,9 @@ public class CommandRegistry {
     /**
      * Создаёт реестр и регистрирует команды ls, cd и exit.
      */
-    public CommandRegistry() {
+    public CommandRegistry(VirtualFileSystem fileSystem) {
         LsCommand ls = new LsCommand();
-        CdCommand cd = new CdCommand();
+        CdCommand cd = new CdCommand(fileSystem);
         ExitCommand exit = new ExitCommand();
 
         commands.put("ls", ls);
