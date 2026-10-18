@@ -6,6 +6,7 @@ import org.example.parser.Parser;
 import org.example.command.CommandRegistry;
 import org.example.command.Command;
 import org.example.config.Config;
+import org.example.vfs.VfsDirectory;
 
 
 import java.io.IOException;
@@ -33,6 +34,7 @@ public class Terminal {
     private final Parser parser;
     private final CommandRegistry commands;
     private final Config config;
+    private final VfsDirectory vfsRoot;
 
     /**
      * Создаёт терминал и подготавливает данные из ОС.
@@ -42,12 +44,13 @@ public class Terminal {
      *
      * @param config настройки эмулятора из параметров командной строки
      */
-    public Terminal(Config config) {
+    public Terminal(Config config, VfsDirectory vfsRoot) {
         this.hostName = resolveHostName();
         this.userName = System.getProperty("user.name");
         this.parser = new Parser(System.getenv());
         this.commands = new CommandRegistry();
         this.config = config;
+        this.vfsRoot = vfsRoot;
 
 
     }
