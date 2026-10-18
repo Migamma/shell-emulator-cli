@@ -1,6 +1,9 @@
 package org.example;
+import org.example.command.CommandResult;
 import org.example.parser.ParsedCommand;
 import org.example.parser.Parser;
+import org.example.command.CommandRegistry;
+import org.example.command.Command;
 
 import java.net.UnknownHostException;
 import java.util.Scanner;
@@ -11,11 +14,14 @@ public class Terminal {
     private final String hostName;
     private static final String DEFAULT_HOSTNAME = "localhost";
     private final Parser parser;
+    private final CommandRegistry commands;
 
     public Terminal(){
         this.hostName = resolveHostName();
         this.userName = System.getProperty("user.name");
         this.parser = new Parser(System.getenv());
+        this.commands = new CommandRegistry();
+
     }
 
     private String resolveHostName(){
@@ -30,6 +36,24 @@ public class Terminal {
         return userName + "@" + hostName + ":~$ ";
     }
 
+    private CommandResult executeLine(String line){
+        ParsedCommand parsed;
+        try{
+            parsed = parser.parse(line);
+
+        } catch (IllegalArgumentException e){
+            return  new CommandResult(e.getMessage(), false, false);
+        }
+
+        Command command = commands.find(parsed.getCommand());
+
+        if (command == null){
+            return new CommandResult(parsed.getCommand() + ": command not found", false, false);
+        }
+
+        return command.execute(parsed.getArgument());
+    }
+
     public void run(){
         Scanner input = new Scanner(System.in);
         while (true){
@@ -38,12 +62,22 @@ public class Terminal {
                 System.out.println();
                 break;
             }
-            String command = input.nextLine();
-            if (command.isBlank()){
+            String line = input.nextLine();
+            if (line.isBlank()){
                 continue;
             }
-            ParsedCommand parsed = parser.parse(command);
-            System.out.println(parsed.toString());
+
+
+            CommandResult result = executeLine(line);
+            if (!result.getOutput().isEmpty()){
+                System.out.println(result.getOutput());
+            }
+
+            if (result.isExit()){
+                break;
+            }
+
+
         }
     }
 }
