@@ -1,4 +1,5 @@
 package org.example;
+
 import org.example.command.CommandResult;
 import org.example.parser.ParsedCommand;
 import org.example.parser.Parser;
@@ -7,7 +8,11 @@ import org.example.command.Command;
 import org.example.config.Config;
 
 
+import java.io.IOException;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 import java.util.Scanner;
 import java.net.InetAddress;
 
@@ -26,12 +31,13 @@ public class Terminal {
     private final Parser parser;
     private final CommandRegistry commands;
     private final Config config;
+
     /**
      * Создает терминал и подготавливает данные из ОС.
      * Имя пользователя и имя хоста определяется в ОС.
      * Создает парсер с переменными окружения системы и реестр команд.
      */
-    public Terminal(Config config){
+    public Terminal(Config config) {
         this.hostName = resolveHostName();
         this.userName = System.getProperty("user.name");
         this.parser = new Parser(System.getenv());
@@ -46,11 +52,11 @@ public class Terminal {
      *
      * @return имя компьютера; при ошибке ставится название localhost
      */
-    private String resolveHostName(){
-        try{
+    private String resolveHostName() {
+        try {
             InetAddress host = InetAddress.getLocalHost();
-            return  host.getHostName();
-        } catch (UnknownHostException e){
+            return host.getHostName();
+        } catch (UnknownHostException e) {
             return DEFAULT_HOSTNAME;
         }
     }
@@ -60,8 +66,8 @@ public class Terminal {
      *
      * @return строка приглашения в форме username@hostname:~$.
      */
-    private String buildPrompt(){
-        if(config.getPrompt() != null){
+    private String buildPrompt() {
+        if (config.getPrompt() != null) {
             return config.getPrompt();
         }
         return userName + "@" + hostName + ":~$ ";
@@ -74,18 +80,18 @@ public class Terminal {
      * @return результат выполненной команды; если строку не удалось
      * разобрать или команда не найдена, результат с ошибкой.
      */
-    private CommandResult executeLine(String line){
+    private CommandResult executeLine(String line) {
         ParsedCommand parsed;
-        try{
+        try {
             parsed = parser.parse(line);
 
-        } catch (IllegalArgumentException e){
-            return  new CommandResult(e.getMessage(), false, false);
+        } catch (IllegalArgumentException e) {
+            return new CommandResult(e.getMessage(), false, false);
         }
 
         Command command = commands.find(parsed.getCommand());
 
-        if (command == null){
+        if (command == null) {
             return new CommandResult(parsed.getCommand() + ": command not found", false, false);
         }
 
@@ -97,27 +103,64 @@ public class Terminal {
      * <p>
      * Метод завершается по команде exit или при достижении конца ввода.
      */
-    public void run(){
+    public void run() {
+        String scriptPath = config.getScriptPath();
+        if (scriptPath != null){
+            if (!runScript(scriptPath)){
+                return;
+            }
+        }
+
         Scanner input = new Scanner(System.in);
-        while (true){
+        while (true) {
             System.out.print(buildPrompt());
-            if (!input.hasNextLine()){
+            if (!input.hasNextLine()) {
                 System.out.println();
                 break;
             }
             String line = input.nextLine();
-            if (line.isBlank()){
+            if (line.isBlank()) {
                 continue;
             }
 
             CommandResult result = executeLine(line);
-            if (!result.getOutput().isEmpty()){
+            if (!result.getOutput().isEmpty()) {
                 System.out.println(result.getOutput());
             }
 
-            if (result.isExit()){
+            if (result.isExit()) {
                 break;
             }
         }
+    }
+
+    private boolean runScript(String scriptPath) {
+        Path path = Path.of(scriptPath);
+        List<String> lines;
+        try {
+            lines = Files.readAllLines(path);
+        } catch (IOException e) {
+            System.err.println("cannot read script");
+            return false;
+        }
+        for (int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i);
+            if (line.isBlank()) {
+                continue;
+            }
+            System.out.println(buildPrompt() + line);
+            CommandResult result = executeLine(line);
+            if (!result.getOutput().isEmpty()) {
+                System.out.println(result.getOutput());
+            }
+            if (!result.isSuccess()) {
+                System.err.println("script stopped at line " + (i + 1));
+                return true;
+            }
+            if (result.isExit()) {
+                return false;
+            }
+        }
+        return true;
     }
 }
