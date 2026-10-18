@@ -1,0 +1,7 @@
+ls
+ls -l /home
+cd /home/user
+cd
+cd $HOME
+cd a b
+pwd

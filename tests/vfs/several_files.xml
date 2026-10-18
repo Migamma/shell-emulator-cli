@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vfs>
+    <file name="hello.txt">SGVsbG8=</file>
+    <file name="lines.txt">bGluZTEKbGluZTIKbGluZTMK</file>
+    <file name="empty.txt"/>
+</vfs>
