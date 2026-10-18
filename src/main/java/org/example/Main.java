@@ -2,6 +2,8 @@ package org.example;
 
 import org.example.config.Config;
 import org.example.config.ConfigParser;
+import org.example.vfs.VfsLoadException;
+import org.example.vfs.VfsLoader;
 
 /**
  * Точка входа эмулятора командной оболочки.
@@ -24,6 +26,15 @@ public class Main {
             return;
         }
         printConfig(config);
+
+        if (config.getVfsPath() != null){
+            try{
+                VfsLoader.load(config.getVfsPath());
+            } catch (VfsLoadException e) {
+                System.err.println(e.getMessage());
+                System.exit(1);
+            }
+        }
 
         Terminal terminal = new Terminal(config);
 
