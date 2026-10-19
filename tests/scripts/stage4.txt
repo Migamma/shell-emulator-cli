@@ -1,0 +1,22 @@
+ls
+ls /home/user
+ls home
+ls readme.txt
+ls tmp
+cd home/user
+ls
+cd docs
+ls
+tac notes.txt
+cd ..
+ls
+cd .
+cd /home/user/docs/old
+ls
+cd ../../..
+ls
+cd
+tac /home/user/docs/notes.txt
+tac readme.txt
+uname
+cd nope
