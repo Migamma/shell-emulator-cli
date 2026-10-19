@@ -10,11 +10,19 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Команда tac: выводит строки файла в обратном порядке.
+ * <p>
+ * Принимает ровно один аргумент - путь к файлу.
+ */
 public class TacCommand implements Command {
     private static final int MAX_ARGS = 1;
     private final VirtualFileSystem fileSystem;
 
-    TacCommand(VirtualFileSystem fileSystem) {
+    /**
+     * @param fileSystem файловая система, с которой работает команда
+     */
+    public TacCommand(VirtualFileSystem fileSystem) {
         this.fileSystem = fileSystem;
     }
 
@@ -23,8 +31,8 @@ public class TacCommand implements Command {
         if (args.length > MAX_ARGS) {
             return new CommandResult("tac: too many arguments", false, false);
         }
-        if (args.length == 0){
-            return new CommandResult("tac: need a one argument", false, false);
+        if (args.length == 0) {
+            return new CommandResult("tac: missing file operand", false, false);
         }
 
         VfsNode node = fileSystem.resolve(args[0]);
@@ -41,7 +49,7 @@ public class TacCommand implements Command {
         String text = new String(content, StandardCharsets.UTF_8);
 
         String[] lines = text.split("\n");
-        List<String> reversed =  Arrays.asList(lines);
+        List<String> reversed = Arrays.asList(lines);
         Collections.reverse(reversed);
         return new CommandResult(String.join("\n", reversed), true, false);
     }

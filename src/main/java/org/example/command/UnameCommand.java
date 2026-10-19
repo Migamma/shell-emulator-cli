@@ -1,6 +1,8 @@
 package org.example.command;
 
-
+/**
+ * Команда uname: выводит название ОС, в которой запущен эмулятор.
+ */
 public class UnameCommand implements Command {
     private static final int MAX_ARGUMENT = 0;
 

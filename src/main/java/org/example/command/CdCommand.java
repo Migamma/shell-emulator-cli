@@ -5,14 +5,17 @@ import org.example.vfs.VfsNode;
 import org.example.vfs.VirtualFileSystem;
 
 /**
- * Заглушка команды cd: выводит своё имя и полученный аргумент.
+ * Команда cd: делает указанную папку текущей.
  * <p>
- * Принимает не больше одного аргумента, иначе возвращает ошибку.
+ * Без аргумента переходит в корень. Принимает не больше одного аргумента.
  */
 public class CdCommand implements Command {
     private static final int MAX_ARGS = 1;
     private final VirtualFileSystem fileSystem;
 
+    /**
+     * @param fileSystem файловая система, с которой работает команда
+     */
     public CdCommand(VirtualFileSystem fileSystem) {
         this.fileSystem = fileSystem;
     }

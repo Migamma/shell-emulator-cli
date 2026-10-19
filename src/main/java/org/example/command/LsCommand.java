@@ -8,12 +8,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Заглушка команды ls: выводит своё имя и полученные аргументы.
+ * Команда ls: выводит имена файлов и папок в текущей или указанной папке.
+ * <p>
+ * Для файла выводит его имя. Принимает не больше одного аргумента.
  */
 public class LsCommand implements Command {
     private final VirtualFileSystem fileSystem;
     private static final int MAX_ARGS = 1;
 
+    /**
+     * @param fileSystem файловая система, с которой работает команда
+     */
     public LsCommand(VirtualFileSystem fileSystem) {
         this.fileSystem = fileSystem;
     }
@@ -22,7 +27,7 @@ public class LsCommand implements Command {
     public CommandResult execute(String[] args) {
         VfsNode node = args.length == 0 ? fileSystem.getCurrent() : fileSystem.resolve(args[0]);
 
-        if (args.length > MAX_ARGS){
+        if (args.length > MAX_ARGS) {
             return new CommandResult("ls: too many arguments", false, false);
         }
         if (node == null) {
