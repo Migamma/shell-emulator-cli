@@ -15,13 +15,17 @@ public class CommandRegistry {
      * Создаёт реестр и регистрирует команды ls, cd и exit.
      */
     public CommandRegistry(VirtualFileSystem fileSystem) {
-        LsCommand ls = new LsCommand();
+        LsCommand ls = new LsCommand(fileSystem);
         CdCommand cd = new CdCommand(fileSystem);
         ExitCommand exit = new ExitCommand();
+        UnameCommand uname = new UnameCommand();
+        TacCommand tac = new TacCommand(fileSystem);
 
         commands.put("ls", ls);
         commands.put("cd", cd);
         commands.put("exit", exit);
+        commands.put("uname", uname);
+        commands.put("tac", tac);
     }
 
     /**
