@@ -9,13 +9,15 @@
 читает команду, выполняет её и выводит результат. Работа эмулятора максимально
 приближена к работе в командной строке UNIX.
 
-Текущий этап: **этап 3 (VFS)**. Виртуальная файловая система загружается в память, команды ls и cd пока являются заглушками
+Текущий этап: **этап 4 (основные команды)**. Команды ls и cd работают
+с виртуальной файловой системой, добавлены команды uname и tac.
 
 ## Функции и настройки
 
 ### Приглашение к вводу
 
-По умолчанию формируется из реальных данных ОС в формате `username@hostname:~$`.
+По умолчанию формируется из реальных данных ОС и текущей папки VFS
+в формате `username@hostname:путь$`, например `mike@laptop:/home/user$`.
 Если имя хоста определить не удалось, используется `localhost`.
 Приглашение можно заменить своим с помощью параметра `--prompt`.
 
@@ -28,11 +30,14 @@
 
 | Команда | Описание |
 |---|---|
-| `ls [аргументы]` | заглушка: выводит своё имя и полученные аргументы |
-| `cd [путь]` | заглушка: выводит своё имя и аргумент; принимает не больше одного аргумента |
-| `exit` | завершает работу эмулятора; аргументов не принимает |
+| `ls [путь]` | выводит содержимое текущей или указанной папки; для файла выводит его имя |
+| `cd [путь]` | переходит в указанную папку; без аргумента переходит в корень |
+| `tac файл` | выводит строки файла в обратном порядке |
+| `uname` | выводит название ОС, в которой запущен эмулятор |
+| `exit` | завершает работу эмулятора |
 
-Работа также завершается при конце ввода (Ctrl+D).
+Пути могут быть абсолютными (`/home/user`) и относительными (`docs/notes.txt`),
+поддерживаются `.` и `..`. Работа также завершается при конце ввода (Ctrl+D).
 
 ### Параметры запуска
 
@@ -44,6 +49,7 @@
 
 Все параметры необязательные и могут идти в любом порядке.
 При запуске эмулятор выводит значения всех параметров.
+Без `--vfs` используется пустая файловая система.
 
 ### Стартовый скрипт
 
@@ -98,7 +104,12 @@ VFS загружается из XML-файла и хранится только 
 | Ситуация | Сообщение |
 |---|---|
 | неизвестная команда | `имя: command not found` |
-| лишние аргументы у cd или exit | `cd: too many arguments` |
+| лишние аргументы | `cd: too many arguments` |
+| путь не найден в ls или tac | `ls: cannot access 'путь': No such file or directory` |
+| путь не найден в cd | `cd: no such file or directory: путь` |
+| cd на файл | `cd: not a directory: путь` |
+| tac на папку | `tac: путь: Is a directory` |
+| tac без файла | `tac: missing file operand` |
 | после подстановки переменных не осталось команды | `no command after variable expansion` |
 | ошибка в стартовом скрипте | `script stopped at line N` |
 
@@ -129,7 +140,7 @@ mvn package
 Запуск с параметрами:
 
 ```
-./run.sh --prompt "emu> " --script tests/scripts/script_ok.txt
+./run.sh --vfs tests/vfs/deep.xml --script tests/scripts/stage4.txt
 ```
 
 Скрипт `run.sh` собирает проект и запускает эмулятор, передавая ему все параметры.
@@ -137,7 +148,7 @@ mvn package
 ### Тесты
 
 Тестовые скрипты лежат в папке `tests`, стартовые скрипты эмулятора
-в `tests/scripts`. Тесты можно запускать из любой папки:
+в `tests/scripts`, примеры VFS в `tests/vfs`. Тесты можно запускать из любой папки:
 
 ```
 ./tests/test_prompt.sh
@@ -145,26 +156,34 @@ mvn package
 ./tests/test_all_options.sh
 ./tests/test_invalid_options.sh
 ./tests/test_vfs.sh
+./tests/test_commands.sh
 ```
 
 ## Примеры использования
 
-Интерактивный режим:
+Работа с VFS:
 
 ```
-$ ./run.sh
-VFS path: null
+$ ./run.sh --vfs tests/vfs/deep.xml
+VFS path: tests/vfs/deep.xml
 Prompt: null
 Script: null
-mike@tazik-logovazik:~$ ls -l /tmp
-ls: args: -l /tmp
-mike@tazik-logovazik:~$ cd $HOME
-cd: args: /home/mike
-mike@tazik-logovazik:~$ cd a b
-cd: too many arguments
-mike@tazik-logovazik:~$ pwd
-pwd: command not found
-mike@tazik-logovazik:~$ exit
+VFS loaded
+mike@tazik-logovazik:/$ ls
+home  readme.txt  tmp
+mike@tazik-logovazik:/$ cd home/user/docs
+mike@tazik-logovazik:/home/user/docs$ ls
+notes.txt  old
+mike@tazik-logovazik:/home/user/docs$ tac notes.txt
+line3
+line2
+line1
+mike@tazik-logovazik:/home/user/docs$ cd ..
+mike@tazik-logovazik:/home/user$ uname
+Linux
+mike@tazik-logovazik:/home/user$ cd nope
+cd: no such file or directory: nope
+mike@tazik-logovazik:/home/user$ exit
 ```
 
 Стартовый скрипт с ошибкой и своим приглашением:
@@ -175,28 +194,10 @@ VFS path: null
 Prompt: emu> 
 Script: tests/scripts/script_error.txt
 emu> ls
-ls: args:
 emu> pwd
 pwd: command not found
 script stopped at line 2
 emu> exit
-```
-
-Неверный параметр:
-
-```
-$ ./run.sh --foo
-unknown option: --foo
-```
-Загрузка VFS:
-
-```
-$ ./run.sh --vfs tests/vfs/deep.xml
-VFS path: tests/vfs/deep.xml
-Prompt: null
-Script: null
-VFS loaded
-mike@tazik-logovazik:~$ exit
 ```
 
 Неверный формат VFS:
