@@ -20,7 +20,11 @@ public class MvCommand implements Command{
 
         VfsNode node = fileSystem.resolve(args[0]);
         if (node == null){
-            return new CommandResult("No such file or directory", false, false);
+            return new CommandResult("mv: no such file or directory " + args[0], false, false);
+        }
+
+        if (node == fileSystem.getRoot()){
+            return new CommandResult("mv: cannot move root ", false, false);
         }
 
         VfsNode target = fileSystem.resolve(args[1]);
@@ -29,7 +33,30 @@ public class MvCommand implements Command{
             fileSystem.move(node, (VfsDirectory) target, node.getName());
             return new CommandResult("", true, false);
         } else{
-            return new CommandResult("mv: not supported yet", false, false);
+            VfsDirectory targetDirectory = findTargetDirectory(args[1]);
+            if (targetDirectory == null){
+                return new CommandResult("mv: target directory not found: " + args[1], false, false);
+            }
+            String newName = args[1].substring(args[1].lastIndexOf("/") + 1);
+            fileSystem.move(node, targetDirectory, newName);
+            return new CommandResult("", true, false);
+        }
+    }
+
+    private VfsDirectory findTargetDirectory(String arg){
+        int lastSlash = arg.lastIndexOf('/');
+        if (lastSlash == -1){
+            return fileSystem.getCurrent();
+        }
+        String dirPath = arg.substring(0, lastSlash);
+        if (dirPath.isEmpty()){
+            return  fileSystem.getRoot();
+        }
+        VfsNode node = fileSystem.resolve(dirPath);
+        if (node instanceof VfsDirectory){
+            return (VfsDirectory) node;
+        } else {
+            return null;
         }
     }
 }
