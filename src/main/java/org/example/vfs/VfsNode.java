@@ -32,9 +32,15 @@ public abstract class VfsNode {
         return parent;
     }
 
-    void setName(String name){
+    /**
+     * Меняет имя узла. Вызывается только при перемещении из {@link VirtualFileSystem}.
+     *
+     * @param name новое имя узла
+     */
+    void setName(String name) {
         this.name = name;
     }
+
     /**
      * Задаёт папку, в которой лежит узел. Вызывается только из {@link VfsDirectory}.
      *

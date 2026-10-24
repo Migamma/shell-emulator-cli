@@ -12,7 +12,7 @@ public class CommandRegistry {
     private final Map<String, Command> commands = new HashMap<>();
 
     /**
-     * Создаёт реестр и регистрирует команды ls, cd, tac, uname и exit.
+     * Создаёт реестр и регистрирует команды ls, cd, tac, mv, uname и exit.
      *
      * @param fileSystem файловая система для команд, работающих с VFS
      */

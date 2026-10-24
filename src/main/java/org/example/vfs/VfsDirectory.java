@@ -30,6 +30,7 @@ public class VfsDirectory extends VfsNode {
         children.put(child.getName(), child);
         child.setParent(this);
     }
+
     /**
      * Находит вложенный узел по имени.
      *
@@ -47,7 +48,12 @@ public class VfsDirectory extends VfsNode {
         return children.values();
     }
 
-    public void removeChild (String name){
+    /**
+     * Убирает вложенный узел из папки по имени.
+     *
+     * @param name имя удаляемого узла
+     */
+    public void removeChild(String name) {
         children.remove(name);
     }
 }

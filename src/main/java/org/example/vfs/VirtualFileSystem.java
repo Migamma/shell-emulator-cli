@@ -98,7 +98,16 @@ public class VirtualFileSystem {
         return path.toString();
     }
 
-    public void move(VfsNode node, VfsDirectory target, String newName){
+    /**
+     * Перемещает узел в другую папку, при необходимости переименовывая его.
+     * <p>
+     * Проверки корректности перемещения выполняет вызывающий код.
+     *
+     * @param node    перемещаемый узел; не может быть корнем
+     * @param target  папка назначения
+     * @param newName имя узла в папке назначения
+     */
+    public void move(VfsNode node, VfsDirectory target, String newName) {
         node.getParent().removeChild(node.getName());
         node.setName(newName);
         target.addChild(node);
