@@ -1,0 +1,19 @@
+ls
+mv readme.txt tmp
+ls tmp
+mv tmp/readme.txt info.txt
+ls
+mv info.txt /tmp/notes.txt
+ls /tmp
+mv home/user/docs tmp
+ls /tmp
+ls /tmp/docs
+cd /tmp/docs
+mv ../notes.txt old
+ls old
+mv old/notes.txt ../../home/user/back.txt
+ls /home/user
+cd
+mv tmp/docs/old home/user/archive
+ls home/user
+mv home home/user
