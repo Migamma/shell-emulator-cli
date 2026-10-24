@@ -6,7 +6,7 @@ package org.example.vfs;
  * Хранит имя узла и папку, в которой он лежит.
  */
 public abstract class VfsNode {
-    private final String name;
+    private String name;
     private VfsDirectory parent;
 
     /**
@@ -32,6 +32,9 @@ public abstract class VfsNode {
         return parent;
     }
 
+    void setName(String name){
+        this.name = name;
+    }
     /**
      * Задаёт папку, в которой лежит узел. Вызывается только из {@link VfsDirectory}.
      *

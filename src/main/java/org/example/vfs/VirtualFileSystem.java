@@ -97,5 +97,11 @@ public class VirtualFileSystem {
         }
         return path.toString();
     }
+
+    public void move(VfsNode node, VfsDirectory target, String newName){
+        node.getParent().removeChild(node.getName());
+        node.setName(newName);
+        target.addChild(node);
+    }
 }
 
