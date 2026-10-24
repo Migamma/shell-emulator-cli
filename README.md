@@ -9,8 +9,8 @@
 читает команду, выполняет её и выводит результат. Работа эмулятора максимально
 приближена к работе в командной строке UNIX.
 
-Текущий этап: **этап 4 (основные команды)**. Команды ls и cd работают
-с виртуальной файловой системой, добавлены команды uname и tac.
+Все пять этапов работы выполнены: REPL, конфигурация, виртуальная файловая
+система, основные команды и команда mv, изменяющая файловую систему в памяти.
 
 ## Функции и настройки
 
@@ -33,11 +33,25 @@
 | `ls [путь]` | выводит содержимое текущей или указанной папки; для файла выводит его имя |
 | `cd [путь]` | переходит в указанную папку; без аргумента переходит в корень |
 | `tac файл` | выводит строки файла в обратном порядке |
+| `mv откуда куда` | перемещает или переименовывает файл или папку |
 | `uname` | выводит название ОС, в которой запущен эмулятор |
 | `exit` | завершает работу эмулятора |
 
 Пути могут быть абсолютными (`/home/user`) и относительными (`docs/notes.txt`),
 поддерживаются `.` и `..`. Работа также завершается при конце ввода (Ctrl+D).
+
+### Команда mv
+
+Режим работы зависит от второго аргумента:
+
+| Второй аргумент | Пример | Результат |
+|---|---|---|
+| существующая папка | `mv readme.txt tmp` | файл переносится в папку с прежним именем |
+| несуществующее имя | `mv readme.txt info.txt` | переименование в текущей папке |
+| путь с несуществующим именем | `mv readme.txt tmp/info.txt` | перенос в папку с новым именем |
+
+Папки переносятся вместе со всем содержимым. Изменения происходят
+только в памяти, исходный XML-файл не изменяется.
 
 ### Параметры запуска
 
@@ -110,6 +124,12 @@ VFS загружается из XML-файла и хранится только 
 | cd на файл | `cd: not a directory: путь` |
 | tac на папку | `tac: путь: Is a directory` |
 | tac без файла | `tac: missing file operand` |
+| mv с неверным числом аргументов | `mv: expected 2 arguments` |
+| mv: исходный путь не найден | `mv: no such file or directory путь` |
+| mv корня | `mv: cannot move root` |
+| перенос папки в саму себя | `mv: cannot move a directory into itself` |
+| в папке назначения уже есть узел с таким именем | `mv: target already exists` |
+| папка назначения не найдена | `mv: target directory not found: путь` |
 | после подстановки переменных не осталось команды | `no command after variable expansion` |
 | ошибка в стартовом скрипте | `script stopped at line N` |
 
@@ -140,7 +160,7 @@ mvn package
 Запуск с параметрами:
 
 ```
-./run.sh --vfs tests/vfs/deep.xml --script tests/scripts/stage4.txt
+./run.sh --vfs tests/vfs/deep.xml --script tests/scripts/stage5.txt
 ```
 
 Скрипт `run.sh` собирает проект и запускает эмулятор, передавая ему все параметры.
@@ -157,6 +177,7 @@ mvn package
 ./tests/test_invalid_options.sh
 ./tests/test_vfs.sh
 ./tests/test_commands.sh
+./tests/test_mv.sh
 ```
 
 ## Примеры использования
@@ -184,6 +205,28 @@ Linux
 mike@tazik-logovazik:/home/user$ cd nope
 cd: no such file or directory: nope
 mike@tazik-logovazik:/home/user$ exit
+```
+
+Перемещение и переименование:
+
+```
+$ ./run.sh --vfs tests/vfs/deep.xml
+VFS path: tests/vfs/deep.xml
+Prompt: null
+Script: null
+VFS loaded
+mike@tazik-logovazik:/$ mv readme.txt tmp
+mike@tazik-logovazik:/$ ls tmp
+readme.txt
+mike@tazik-logovazik:/$ mv tmp/readme.txt info.txt
+mike@tazik-logovazik:/$ ls
+home  info.txt  tmp
+mike@tazik-logovazik:/$ mv home/user/docs tmp
+mike@tazik-logovazik:/$ ls /tmp/docs
+notes.txt  old
+mike@tazik-logovazik:/$ mv home home/user
+mv: cannot move a directory into itself
+mike@tazik-logovazik:/$ exit
 ```
 
 Стартовый скрипт с ошибкой и своим приглашением:
