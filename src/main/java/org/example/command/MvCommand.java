@@ -30,17 +30,26 @@ public class MvCommand implements Command{
         VfsNode target = fileSystem.resolve(args[1]);
 
         if (target != null && target instanceof VfsDirectory) {
-            fileSystem.move(node, (VfsDirectory) target, node.getName());
-            return new CommandResult("", true, false);
+            return moveTo(node, (VfsDirectory) target, node.getName());
         } else{
             VfsDirectory targetDirectory = findTargetDirectory(args[1]);
             if (targetDirectory == null){
                 return new CommandResult("mv: target directory not found: " + args[1], false, false);
             }
             String newName = args[1].substring(args[1].lastIndexOf("/") + 1);
-            fileSystem.move(node, targetDirectory, newName);
-            return new CommandResult("", true, false);
+            return moveTo(node, targetDirectory, newName);
         }
+    }
+
+    private CommandResult moveTo(VfsNode node, VfsDirectory directory, String name){
+        if (isInside(node, directory)){
+            return new CommandResult("mv: cannot move a directory into itself", false, false);
+        }
+        if (directory.getChild(name) != null){
+            return new CommandResult("mv: target already exists", false, false);
+        }
+        fileSystem.move(node, directory, name);
+        return new CommandResult("", true, false);
     }
 
     private VfsDirectory findTargetDirectory(String arg){
@@ -58,5 +67,16 @@ public class MvCommand implements Command{
         } else {
             return null;
         }
+    }
+
+    private boolean isInside(VfsNode node, VfsDirectory directory){
+        VfsNode vfsnode = directory;
+        while (vfsnode != null){
+            if (vfsnode == node){
+                return true;
+            }
+            vfsnode = vfsnode.getParent();
+        }
+        return false;
     }
 }
