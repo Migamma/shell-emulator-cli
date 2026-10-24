@@ -22,12 +22,14 @@ public class CommandRegistry {
         ExitCommand exit = new ExitCommand();
         UnameCommand uname = new UnameCommand();
         TacCommand tac = new TacCommand(fileSystem);
+        MvCommand mv = new MvCommand(fileSystem);
 
         commands.put("ls", ls);
         commands.put("cd", cd);
         commands.put("exit", exit);
         commands.put("uname", uname);
         commands.put("tac", tac);
+        commands.put("mv", mv);
     }
 
     /**
