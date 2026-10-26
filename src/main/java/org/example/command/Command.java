@@ -14,6 +14,5 @@ public interface Command {
      * @return результат выполнения: текст для вывода, признак успеха
      * и признак завершения работы
      */
-    CommandResult execute(String[] args);
-
+    public CommandResult execute(String[] args);
 }
